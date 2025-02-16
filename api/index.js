@@ -29,20 +29,41 @@ app.get("/", (req, res) => {
 });
 
 app.post("/show", async (req, res) => {
+    console.log("Received data:", req.body);
+
+    const { name } = req.body;
+    if (!name) {
+        return res.status(400).send("Name is required");
+    }
+
     try {
-        const { name } = req.body;
+        const title = new Title({ title: name });
+        await title.save();  // Inserts data & creates database if it doesn’t exist
 
-        // Save to MongoDB
-        const newTitle = new Title({ title: name });
-        await newTitle.save();
-
-        // Render response
+        console.log("Name saved to database");
         res.render("show", { name });
-    } catch (error) {
-        console.log("Error saving to database:", error);
-        res.status(500).send("Internal Server Error");
+    } catch (err) {
+        console.error("Error saving to database:", err);
+        res.status(500).send("Database error");
     }
 });
+
+
+// app.post("/show", async (req, res) => {
+//     try {
+//         const { name } = req.body;
+
+//         // Save to MongoDB
+//         const newTitle = new Title({ title: name });
+//         await newTitle.save();
+
+//         // Render response
+//         res.render("show", { name });
+//     } catch (error) {
+//         console.log("Error saving to database:", error);
+//         res.status(500).send("Internal Server Error");
+//     }
+// });
 
 app.listen(3001, () => {
     console.log("LISTENING ON PORT 3001");
