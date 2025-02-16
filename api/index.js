@@ -7,12 +7,21 @@ const app = express();
 
 
 
+// Choose the correct database URL based on the environment
+const MONGO_URI = process.env.NODE_ENV === "production" 
+    ? process.env.MONGODB_URI_PROD 
+    : process.env.MONGODB_URI_DEV;
 
-mongoose.connect(process.env.MONGO_URI, {
+if (!MONGO_URI) {
+    console.error("MongoDB connection string is missing!");
+    process.exit(1);
+}
+
+mongoose.connect(MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
-}).then(() => console.log("Connected to MongoDB"))
-  .catch(err => console.log("Error:", err));
+}).then(() => console.log(`Connected to MongoDB: ${MONGO_URI}`))
+  .catch(err => console.error("Error:", err));
 
 // Define Mongoose Schema & Model
 const titleSchema = new mongoose.Schema({
